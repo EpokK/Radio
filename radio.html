@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Radio</title>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/prototype/1.7.1.0/prototype.js"></script>
+</head>
+<body>
+	<style type="text/css">
+		.CustomRadio {
+
+		}
+
+		.CustomRadio div {
+			cursor: pointer;
+			width: 60px;
+			margin-left: 10px;
+			font-weight: bold;
+			display: inline-block;
+			padding: 25px 14px;
+			margin-bottom: 0;
+			font-size: 14px;
+			line-height: 20px;
+			color: #333;
+			text-align: center;
+			text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
+			vertical-align: middle;
+			cursor: pointer;
+			background-color: whiteSmoke;
+			background-image: -webkit-gradient(linear,0 0,0 100%,from(white),to(#E6E6E6));
+			background-image: -webkit-linear-gradient(top,white,#E6E6E6);
+			background-image: -o-linear-gradient(top,white,#E6E6E6);
+			background-image: linear-gradient(to bottom,white,#E6E6E6);
+			background-image: -moz-linear-gradient(top,white,#E6E6E6);
+			background-repeat: repeat-x;
+			border: 1px solid #BBB;
+			border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+			border-color: #E6E6E6 #E6E6E6 #BFBFBF;
+			border-bottom-color: #A2A2A2;
+			-webkit-border-radius: 4px;
+			-moz-border-radius: 4px;
+			border-radius: 4px;
+			filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ffffffff',endColorstr='#ffe6e6e6',GradientType=0);
+			filter: progid:dximagetransform.microsoft.gradient(enabled=false);
+			-webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2),0 1px 2px rgba(0, 0, 0, 0.05);
+			-moz-box-shadow: inset 0 1px 0 rgba(255,255,255,0.2),0 1px 2px rgba(0,0,0,0.05);
+			box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2),0 1px 2px rgba(0, 0, 0, 0.05);
+		}
+
+		.CustomRadio div:hover {
+			color: #333;
+			text-decoration: none;
+			background-color: #E6E6E6;
+			background-position: 0 -15px;
+			-webkit-transition: background-position .1s linear;
+			-moz-transition: background-position .1s linear;
+			-o-transition: background-position .1s linear;
+			transition: background-position .1s linear;
+		}
+
+		.CustomRadio div.Active {
+			color: white;
+			text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+			background-color: #006DCC;
+			background-image: -webkit-gradient(linear,0 0,0 100%,from(#08C),to(#04C));
+			background-image: -webkit-linear-gradient(top,#08C,#04C);
+			background-image: -o-linear-gradient(top,#08C,#04C);
+			background-image: linear-gradient(to bottom,#08C,#04C);
+			background-image: -moz-linear-gradient(top,#08C,#04C);
+			background-repeat: repeat-x;
+			border-color: #04C #04C #002A80;
+			border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+		}
+
+		.CustomRadio div.Active:hover {
+			background-color: #04C;
+		}
+
+		.CustomRadio div.Disable {
+			cursor: default;
+			color: #CCC;
+		}
+	</style>
+
+	<script type="text/javascript">
+		var Radio = Class.create({
+			// constructeur
+			initialize: function(oElement, aButtons) {
+				if(oElement && aButtons) {
+					this.oElement = oElement;
+					this.aButtons = aButtons;
+					this.aElements = [];
+					this._build();
+				}
+			},
+			// construit la structure du custom et appelle l'ajout des boutons
+			_build: function() {
+				this.oElement.writeAttribute('class', 'CustomRadio');
+				this.aButtons.each(function(oButton) {
+					var oB = this._add(oButton);
+					if(oButton.bActive) {
+						this._active(oB);
+					}
+				}.bind(this));
+			},
+			// ajoute un bouton radio
+			_add: function(oButton) {
+				if(oButton) {
+					var oB = new Element('div');
+					oB.update(oButton.sText);
+					this.oElement.appendChild(oB);
+					this._observe(oB, oButton);
+					this.aElements.push(oB);
+					return oB;
+				}
+			},
+			// observe le clique sur le bouton
+			_observe: function(oB, oButton) {
+				if(oB && oButton) {
+					Element.observe(oB, 'click', function() {
+						this._active(oB);
+						oButton.oAction();
+					}.bind(this));
+				}
+			},
+			_delete: function(oButton) {
+				oButton.destroy();
+			},
+
+			_disable: function(oButton) {
+				oButton.addClassName('Disable');
+			},
+			_enable: function(oButton) {
+				oButton.removeClassName('Disable');
+			},
+			_active: function(oButton) {
+				this.aElements.each(function(oButton) {
+					this._inactive(oButton);
+				}.bind(this));
+				oButton.addClassName('Active');
+			},
+			_inactive: function(oButton) {
+				oButton.removeClassName('Active');
+			}
+		});
+	</script>
+
+	<h1>Custom Radio</h1>
+
+	<div id="radio"></div>
+
+ 	<script type="text/javascript">
+ 		var oRadio = new Radio($('radio'),
+ 			[
+ 				{sText: 'bouton 1', sIcon: '', oAction: function() {console.log('test1');}, bActive: true},
+ 				{sText: 'bouton 2', sIcon: '', oAction: function() {console.log('test2');}},
+ 				{sText: 'bouton 3', sIcon: '', oAction: function() {console.log('test3');}}
+ 			]
+ 		);
+ 	</script>
+</body>
+</html>
